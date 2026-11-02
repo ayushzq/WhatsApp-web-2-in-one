@@ -1,6 +1,9 @@
 name: YouTube patch (ads + background + download)
 on: workflow_dispatch
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -34,10 +37,11 @@ jobs:
             -e "Downloads" \
             -o youtube-patched.apk youtube.apk
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: output
-          path: |
-            youtube-patched.apk
-            microg.apk
-            all-patches.txt
+      - name: Release me alag alag files upload
+        run: |
+          TAG="yt-patched-${{ github.run_number }}"
+          gh release create "$TAG" youtube-patched.apk microg.apk all-patches.txt \
+            --title "YouTube patched #${{ github.run_number }}" \
+            --notes "microg.apk pehle install karo, phir youtube-patched.apk"
+        env:
+          GH_TOKEN: ${{ github.token }}
